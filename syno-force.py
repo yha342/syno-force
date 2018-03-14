@@ -12,7 +12,7 @@ pwd_list=['admin','1234','123456',]
 
 def scan(subnet):
     print ("Scannining "+str(subnet)+" on port "+str(port_list))
-    nmap = subprocess.check_output(['nmap', subnet, '-p', '5000', '--open'])
+    nmap = subprocess.Popen(['nmap', subnet, '-p', '5000', '--open'])
     ip_list = re.findall( r'[0-9]+(?:\.[0-9]+){3}', nmap.decode('ascii'))
     return ip_list
 
