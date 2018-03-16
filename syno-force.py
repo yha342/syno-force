@@ -100,5 +100,3 @@ if args.force:
 
 print ('*******Done********')
 exit
-  
-
